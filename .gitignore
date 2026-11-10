@@ -13,4 +13,25 @@
 
 # Temporary files
 *.tmp
-*.backup                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+*.backup    
+
+# =====================================
+# PC Software - CMake / raylib
+# =====================================
+
+# CMake build directories
+/software/pc/build*/
+/software/pc/CMakeUserPresets.json
+
+# CMake generated files outside build
+/software/pc/CMakeFiles/
+/software/pc/CMakeCache.txt
+/software/pc/cmake_install.cmake
+
+# Compiler generated files
+*.o
+*.obj
+*.a
+*.dll
+*.pdb
+*.ilk
