@@ -1,65 +1,110 @@
 
 #include "raylib.h"
+#include "BoardView.h"
+
 
 int main() {
 
-    // 1. 初始化窗口
-    const int screenWidth = 800;
-    const int screenHeight = 600;
+    InitWindow(1000, 900, "Xiangqi - S2");
 
-    InitWindow(screenWidth, screenHeight, "Xiangqi - S1");
     SetTargetFPS(60);
 
-    // 2. 定义变量
-    Vector2 mouse_position = {400, 300};
+    // 当前鼠标所在的棋盘坐标
+    int hoverRow = -1;
+    int hoverCol = -1;
 
-    bool is_green = false;
+    // 当前选中的棋盘坐标
+    int selectedRow = -1;
+    int selectedCol = -1;
 
-    // 3. 游戏主循环
+    bool hasSelection = false;
+
     while (!WindowShouldClose()) {
 
-        // ===== 输入与状态更新 =====
+        // ===== 输入处理 =====
 
-        // 获取鼠标位置
-        mouse_position = GetMousePosition();
+        Vector2 mouse = GetMousePosition();
 
-        // 检测鼠标左键
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            is_green = !is_green;
+        bool hoverValid = Xiangqi::ScreenToBoard(
+            mouse,
+            hoverRow,
+            hoverCol
+        );
+
+        // 鼠标左键点击有效交叉点
+        if (hoverValid &&
+            IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+
+            selectedRow = hoverRow;
+            selectedCol = hoverCol;
+
+            hasSelection = true;
         }
 
-        // ===== 绘制画面 =====
+        // ===== 绘制 =====
 
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
 
-        // 绘制横向网格
-        for (int y = 0; y <= screenHeight; y += 50) {
-            DrawLine(0, y, screenWidth, y, LIGHTGRAY);
+        Xiangqi::DrawXiangqiBoard();
+
+        // 显示鼠标当前所在坐标
+        if (hoverValid) {
+
+            DrawText(
+                TextFormat("Hover: row=%d col=%d",
+                           hoverRow, hoverCol),
+                20, 20, 22, DARKGRAY
+            );
+
+            // 蓝色圆圈标记鼠标所在交叉点
+            Vector2 hoverPoint = Xiangqi::BoardToScreen(
+                hoverRow, hoverCol
+            );
+
+            DrawCircleLines(
+                (int)hoverPoint.x,
+                (int)hoverPoint.y,
+                18,
+                BLUE
+            );
+
+        } else {
+
+            DrawText(
+                "Move mouse near a board intersection",
+                20, 20, 22, DARKGRAY
+            );
         }
 
-        // 绘制纵向网格
-        for (int x = 0; x <= screenWidth; x += 50) {
-            DrawLine(x, 0, x, screenHeight, LIGHTGRAY);
+        // 显示选中坐标
+        if (hasSelection) {
+
+            Vector2 selectedPoint = Xiangqi::BoardToScreen(
+                selectedRow, selectedCol
+            );
+
+            DrawCircleLines(
+                (int)selectedPoint.x,
+                (int)selectedPoint.y,
+                11,
+                RED
+            );
+
+            DrawText(
+                TextFormat("Selected: row=%d col=%d",
+                           selectedRow, selectedCol),
+                20, 48, 22, RED
+            );
         }
-
-        // 根据状态选择颜色
-        Color color = is_green ? GREEN : DARKGRAY;
-
-        // 绘制跟随鼠标的圆形
-        DrawCircleV(mouse_position, 25, color);
-
-        // 绘制文字
-        DrawText("Move your mouse!", 20, 20, 20, BLACK);
-        DrawText("Click LEFT button to change color",
-                 20, 50, 20, BLACK);
 
         EndDrawing();
     }
 
-    // 4. 关闭窗口
     CloseWindow();
 
     return 0;
 }
+
+    

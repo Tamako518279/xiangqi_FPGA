@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 下载 raylib
-include(FetchContent)
+include(FetchContent) 
 
 FetchContent_Declare(
     raylib
@@ -26,7 +26,10 @@ FetchContent_MakeAvailable(raylib)
 # 创建我们的程序
 add_executable(xiangqi_pc
     src/main.cpp
+    src/BoardView.cpp
 )
-
+target_include_directories(xiangqi_pc PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 # 链接 raylib
 target_link_libraries(xiangqi_pc PRIVATE raylib)
