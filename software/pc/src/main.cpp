@@ -1,9 +1,11 @@
-
+#include "Board.h"
 #include "raylib.h"
 #include "BoardView.h"
 
 
 int main() {
+
+    xiangqi::Board board;
 
     InitWindow(1000, 900, "Xiangqi - S2");
 
@@ -25,7 +27,7 @@ int main() {
 
         Vector2 mouse = GetMousePosition();
 
-        bool hoverValid = Xiangqi::ScreenToBoard(
+        bool hoverValid = xiangqi::ScreenToBoard(
             mouse,
             hoverRow,
             hoverCol
@@ -47,7 +49,8 @@ int main() {
 
         ClearBackground(RAYWHITE);
 
-        Xiangqi::DrawXiangqiBoard();
+        xiangqi::DrawXiangqiBoard();
+        xiangqi::DrawPieces(board);
 
         // 显示鼠标当前所在坐标
         if (hoverValid) {
@@ -59,7 +62,7 @@ int main() {
             );
 
             // 蓝色圆圈标记鼠标所在交叉点
-            Vector2 hoverPoint = Xiangqi::BoardToScreen(
+            Vector2 hoverPoint = xiangqi::BoardToScreen(
                 hoverRow, hoverCol
             );
 
@@ -81,7 +84,7 @@ int main() {
         // 显示选中坐标
         if (hasSelection) {
 
-            Vector2 selectedPoint = Xiangqi::BoardToScreen(
+            Vector2 selectedPoint = xiangqi::BoardToScreen(
                 selectedRow, selectedCol
             );
 

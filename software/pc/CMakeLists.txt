@@ -27,6 +27,7 @@ FetchContent_MakeAvailable(raylib)
 add_executable(xiangqi_pc
     src/main.cpp
     src/BoardView.cpp
+    src/Board.cpp
 )
 target_include_directories(xiangqi_pc PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

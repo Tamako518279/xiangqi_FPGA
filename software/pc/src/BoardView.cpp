@@ -1,7 +1,7 @@
 #include "BoardView.h"
 #include <cmath>
 
-namespace Xiangqi {
+namespace xiangqi {
 
     Vector2 BoardToScreen(int row, int col) {
         return {
@@ -45,7 +45,7 @@ namespace Xiangqi {
     }
 
     void DrawXiangqiBoard() {
-         Color boardColor = {238, 214, 176, 255};
+    Color boardColor = {238, 214, 176, 255};
     Color lineColor = {80, 55, 35, 255};
 
     const int left = static_cast<int>(BOARD_LEFT);
@@ -120,5 +120,102 @@ namespace Xiangqi {
     DrawText("CHU RIVER", 300, top + 4 * 80 + 25, 20, lineColor);
     DrawText("HAN BORDER", 550, top + 4 * 80 + 25, 20, lineColor);
     }
+
+}
+
+
+namespace xiangqi {
+
+// 将棋子类型转换为显示字符
+namespace {
+
+    const char* GetPieceSymbol(PieceType type) {
+
+        switch (type) {
+
+            case PieceType::General: return "G";
+            case PieceType::Advisor: return "A";
+            case PieceType::Elephant: return "E";
+            case PieceType::Horse: return "H";
+            case PieceType::Chariot: return "R";
+            case PieceType::Cannon: return "C";
+            case PieceType::Soldier: return "S";
+
+            default: return "?";
+        }
+    }
+
+    // 根据阵营确定棋子颜色
+    Color GetSideColor(Side side) {
+
+        if (side == Side::Red) {
+            return Color{190, 35, 35, 255};
+        }
+
+        return Color{45, 45, 45, 255};
+    }
+}
+
+// 根据棋盘数据绘制所有棋子
+void DrawPieces(const Board& board) {
+
+    for (int row = 0; row < BOARD_ROWS; row++) {
+
+        for (int col = 0; col < BOARD_COLS; col++) {
+
+            // 获取当前位置的数据
+            const auto& cell = board.GetPiece(row, col);
+
+            // 如果没有棋子，跳过
+            if (!cell.has_value()) {
+                continue;
+            }
+
+            const Piece& piece = cell.value();
+
+            // 获取屏幕坐标
+            Vector2 center = xiangqi::BoardToScreen(row, col);
+
+            // 确定棋子颜色
+            Color sideColor = GetSideColor(piece.side);
+
+            // 绘制棋子背景
+            DrawCircleV(
+                center,
+                29,
+                Color{247, 232, 200, 255}
+            );
+
+            // 绘制棋子外圈
+            DrawCircleLines(
+                (int)center.x,
+                (int)center.y,
+                29,
+                sideColor
+            );
+
+            DrawCircleLines(
+                (int)center.x,
+                (int)center.y,
+                24,
+                sideColor
+            );
+
+            // 绘制棋子标识
+            const char* symbol = GetPieceSymbol(piece.Type);
+
+            int fontSize = 22;
+            int textWidth = MeasureText(symbol, fontSize);
+
+            DrawText(
+                symbol,
+                (int)center.x - textWidth / 2,
+                (int)center.y - fontSize / 2,
+                fontSize,
+                sideColor
+            );
+        }
+    }
+}
 
 }
