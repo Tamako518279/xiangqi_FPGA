@@ -97,5 +97,38 @@ int Board::CountPieces() const {
     return count;
 }
 
+  bool Board::MovePieces(int fromrow,int fromcol,int torow,int tocol)
+  {
+     auto inside = [] (int row,int col)
+     {
+        return row >= 0 && row < BOARD_ROWS && col >= 0 && col < BOARD_ROWS;
+     };
+
+     if(!inside(fromrow, fromcol) || !inside(torow, tocol))
+        return false;
+
+     if(fromrow == torow && fromcol == tocol)
+        return false;
+
+     Cell& source = cells_[fromrow][fromcol];
+     Cell& target = cells_[torow][tocol];
+
+    if(!source.has_value())
+        return false;
+
+    if(target.has_value() && target->side == source->side)
+        return false;
+
+    target = *source;
+    source.reset();
+
+    return true;
+
+    
+    
+
+
+
+  }
 
 }

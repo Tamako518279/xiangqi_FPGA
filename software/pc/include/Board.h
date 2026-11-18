@@ -26,6 +26,8 @@ namespace xiangqi
      //统计现有棋子数量
      int CountPieces() const;
 
+     bool MovePieces(int fromrow,int fromcol,int torow,int tocol);
+
   private:
      //内部数据
      std::array<

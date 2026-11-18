@@ -1,8 +1,8 @@
-
 #pragma once
 
 #include "raylib.h"
 #include "Board.h"
+#include "Position.h"
 
 namespace xiangqi {
 
@@ -23,6 +23,7 @@ bool ScreenToBoard(
 
 // 棋盘绘制
 void DrawXiangqiBoard();
+void DrawCursor(Position position);
 
 // 棋子绘制
 void DrawPieces(const Board& board);

@@ -1,113 +1,78 @@
-#include "Board.h"
 #include "raylib.h"
-#include "BoardView.h"
 
+#include "BoardView.h"
+#include "EventHandler.h"
+#include "MockFPGA.h"
+
+#include <optional>
+
+namespace {
+
+std::optional<xiangqi::InputAction> ToInputAction(int key) {
+    using xiangqi::InputAction;
+
+    switch (key) {
+        case KEY_UP:    return InputAction::Up;
+        case KEY_DOWN:  return InputAction::Down;
+        case KEY_LEFT:  return InputAction::Left;
+        case KEY_RIGHT: return InputAction::Right;
+        case KEY_ENTER: return InputAction::Confirm;
+        case KEY_R:     return InputAction::Reset;
+        default:        return std::nullopt;
+    }
+}
+
+}
 
 int main() {
-
-    xiangqi::Board board;
-
-    InitWindow(1000, 900, "Xiangqi - S2");
-
+    InitWindow(1000, 900, "Xiangqi - Keyboard");
     SetTargetFPS(60);
 
-    // 当前鼠标所在的棋盘坐标
-    int hoverRow = -1;
-    int hoverCol = -1;
-
-    // 当前选中的棋盘坐标
-    int selectedRow = -1;
-    int selectedCol = -1;
-
-    bool hasSelection = false;
+    xiangqi::AppState app;
+    xiangqi::MockFpga mock;
+    for (const auto& event : mock.InitialEvents()) {
+        xiangqi::HandleFpgaEvent(app, event);
+    }
 
     while (!WindowShouldClose()) {
-
-        // ===== 输入处理 =====
-
-        Vector2 mouse = GetMousePosition();
-
-        bool hoverValid = xiangqi::ScreenToBoard(
-            mouse,
-            hoverRow,
-            hoverCol
-        );
-
-        // 鼠标左键点击有效交叉点
-        if (hoverValid &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-
-            selectedRow = hoverRow;
-            selectedCol = hoverCol;
-
-            hasSelection = true;
+        int key = GetKeyPressed();
+        while (key != 0) {
+            auto action = ToInputAction(key);
+            if (action) {
+                for (const auto& event : mock.Press(*action)) {
+                    xiangqi::HandleFpgaEvent(app, event);
+                }
+            }
+            key = GetKeyPressed();
         }
 
-        // ===== 绘制 =====
-
         BeginDrawing();
-
         ClearBackground(RAYWHITE);
 
         xiangqi::DrawXiangqiBoard();
-        xiangqi::DrawPieces(board);
+        if (app.boardSynchronized) {
+            xiangqi::DrawPieces(app.board);
+        }
+        xiangqi::DrawCursor(app.cursor);
 
-        // 显示鼠标当前所在坐标
-        if (hoverValid) {
-
-            DrawText(
-                TextFormat("Hover: row=%d col=%d",
-                           hoverRow, hoverCol),
-                20, 20, 22, DARKGRAY
-            );
-
-            // 蓝色圆圈标记鼠标所在交叉点
-            Vector2 hoverPoint = xiangqi::BoardToScreen(
-                hoverRow, hoverCol
-            );
-
-            DrawCircleLines(
-                (int)hoverPoint.x,
-                (int)hoverPoint.y,
-                18,
-                BLUE
-            );
-
-        } else {
-
-            DrawText(
-                "Move mouse near a board intersection",
-                20, 20, 22, DARKGRAY
-            );
+        if (app.hasSelection) {
+            const auto& selected = app.selectedPosition;
+            const Vector2 center = xiangqi::BoardToScreen(selected.row, selected.col);
+            DrawCircleLinesV(center, 35.0f, RED);
+            DrawText(TextFormat("Selected: (%d, %d)", selected.row, selected.col),
+                     20, 45, 20, RED);
         }
 
-        // 显示选中坐标
-        if (hasSelection) {
-
-            Vector2 selectedPoint = xiangqi::BoardToScreen(
-                selectedRow, selectedCol
-            );
-
-            DrawCircleLines(
-                (int)selectedPoint.x,
-                (int)selectedPoint.y,
-                11,
-                RED
-            );
-
-            DrawText(
-                TextFormat("Selected: row=%d col=%d",
-                           selectedRow, selectedCol),
-                20, 48, 22, RED
-            );
-        }
-
+        DrawText("Arrows: move cursor / Enter: confirm / R: reset",
+                 20, 15, 20, DARKGRAY);
+        DrawText(TextFormat("Pieces: %d", app.board.CountPieces()), 20, 75, 20, DARKGRAY);
         EndDrawing();
     }
 
     CloseWindow();
-
     return 0;
 }
+
+
 
     

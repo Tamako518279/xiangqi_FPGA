@@ -44,6 +44,11 @@ namespace xiangqi {
     return true;
     }
 
+    void DrawCursor(Position position) {
+    const Vector2 center = BoardToScreen(position.row, position.col);
+    DrawCircleLinesV(center, 39.0f, BLUE);
+}
+
     void DrawXiangqiBoard() {
     Color boardColor = {238, 214, 176, 255};
     Color lineColor = {80, 55, 35, 255};
