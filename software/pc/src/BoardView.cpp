@@ -1,7 +1,22 @@
 #include "BoardView.h"
 #include <cmath>
 
+
 namespace xiangqi {
+
+  namespace 
+  {
+
+    void DrawCenteredText(Font font, const char* text, Vector2 center,
+                      float size, float spacing, Color color) 
+    {
+        const Vector2 extent = MeasureTextEx(font, text, size, spacing);
+        DrawTextEx(font, text,
+               {center.x - extent.x / 2.0f, center.y - extent.y / 2.0f},
+               size, spacing, color);
+    }
+
+   }
 
     Vector2 BoardToScreen(int row, int col) {
         return {
@@ -42,14 +57,14 @@ namespace xiangqi {
     col = candidateCol;
 
     return true;
-    }
-
+    }//这个函数现在已经不起具体作用了，它之前用于在main函数中把鼠标在屏幕上的位置转换为棋盘上
+     //的具体坐标 ，但现在使用键盘控制后棋盘光标已经交由app.cursor控制
     void DrawCursor(Position position) {
     const Vector2 center = BoardToScreen(position.row, position.col);
     DrawCircleLinesV(center, 39.0f, BLUE);
 }
 
-    void DrawXiangqiBoard() {
+    void DrawXiangqiBoard(Font font) {
     Color boardColor = {238, 214, 176, 255};
     Color lineColor = {80, 55, 35, 255};
 
@@ -122,8 +137,11 @@ namespace xiangqi {
     );
 
     // 绘制河界文字
-    DrawText("CHU RIVER", 300, top + 4 * 80 + 25, 20, lineColor);
-    DrawText("HAN BORDER", 550, top + 4 * 80 + 25, 20, lineColor);
+    const float riverY = BOARD_TOP + 4.5f * CELL_SIZE;
+    DrawCenteredText(font, u8"\u695A \u6CB3",
+                 {BOARD_LEFT + 2.0f * CELL_SIZE, riverY}, 28.0f, 6.0f, lineColor);
+    DrawCenteredText(font, u8"\u6C49 \u754C",
+                 {BOARD_LEFT + 6.0f * CELL_SIZE, riverY}, 28.0f, 6.0f, lineColor);
     }
 
 }
@@ -134,21 +152,19 @@ namespace xiangqi {
 // 将棋子类型转换为显示字符
 namespace {
 
-    const char* GetPieceSymbol(PieceType type) {
-
-        switch (type) {
-
-            case PieceType::General: return "G";
-            case PieceType::Advisor: return "A";
-            case PieceType::Elephant: return "E";
-            case PieceType::Horse: return "H";
-            case PieceType::Chariot: return "R";
-            case PieceType::Cannon: return "C";
-            case PieceType::Soldier: return "S";
-
-            default: return "?";
-        }
+    const char* GetPieceSymbol(const Piece& piece) {
+    const bool red = (piece.side == Side::Red);
+    switch (piece.Type) {
+        case PieceType::General:  return red ? u8"\u5E05" : u8"\u5C06";
+        case PieceType::Advisor:  return red ? u8"\u4ED5" : u8"\u58EB";
+        case PieceType::Elephant: return red ? u8"\u76F8" : u8"\u8C61";
+        case PieceType::Horse:    return u8"\u9A6C";
+        case PieceType::Chariot:  return u8"\u8F66";
+        case PieceType::Cannon:   return u8"\u70AE";
+        case PieceType::Soldier:  return red ? u8"\u5175" : u8"\u5352";
     }
+    return "?";
+}
 
     // 根据阵营确定棋子颜色
     Color GetSideColor(Side side) {
@@ -162,7 +178,7 @@ namespace {
 }
 
 // 根据棋盘数据绘制所有棋子
-void DrawPieces(const Board& board) {
+void DrawPieces(const Board& board,Font font) {
 
     for (int row = 0; row < BOARD_ROWS; row++) {
 
@@ -207,18 +223,9 @@ void DrawPieces(const Board& board) {
             );
 
             // 绘制棋子标识
-            const char* symbol = GetPieceSymbol(piece.Type);
+            DrawCenteredText(font, GetPieceSymbol(piece), center, 28.0f, 0.0f, sideColor);
 
-            int fontSize = 22;
-            int textWidth = MeasureText(symbol, fontSize);
-
-            DrawText(
-                symbol,
-                (int)center.x - textWidth / 2,
-                (int)center.y - fontSize / 2,
-                fontSize,
-                sideColor
-            );
+           
         }
     }
 }

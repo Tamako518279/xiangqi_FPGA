@@ -22,10 +22,11 @@ bool ScreenToBoard(
 );
 
 // 棋盘绘制
-void DrawXiangqiBoard();
+void DrawXiangqiBoard(Font font);
 void DrawCursor(Position position);
 
 // 棋子绘制
-void DrawPieces(const Board& board);
+void DrawPieces(const Board& board,Font font);
 
+ 
 }

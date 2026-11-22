@@ -4,13 +4,16 @@
 #include "Position.h"
 
 #include <optional>
+#include "Moverecord.h"
 
 namespace xiangqi {
 
 enum class FpgaEventType {
     CursorChanged,
     SelectionChanged,
-    BoardState
+    BoardState,
+    MoveResult,
+    GameReset
 };
 
 struct FpgaEvent {
@@ -18,6 +21,7 @@ struct FpgaEvent {
     Position position{};
     bool selected = false;
     std::optional<Board> snapshot{};
+    std::optional<MoveRecord> moveRecord{};
 };
 
 }

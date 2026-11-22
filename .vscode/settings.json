@@ -1,3 +1,7 @@
 {
-    "cmake.sourceDirectory": "F:/xiangqiFPGA/software/pc"
+   
+    
+    "cmake.sourceDirectory": "F:/xiangqiFPGA/software/pc",
+    "C_Cpp.default.cppStandard": "c++17"
+
 }

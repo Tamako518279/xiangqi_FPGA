@@ -30,6 +30,8 @@ add_executable(xiangqi_pc
     src/Board.cpp
     src/MockFPGA.cpp
     src/EventHandler.cpp
+    src/MoveHistory.cpp
+    src/MoveHistoryView.cpp
 )
 target_include_directories(xiangqi_pc PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

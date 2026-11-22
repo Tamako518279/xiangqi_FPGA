@@ -5,6 +5,7 @@
 #include "MockFPGA.h"
 
 #include <optional>
+#include "MoveHistoryView.h"
 
 namespace {
 
@@ -25,8 +26,11 @@ std::optional<xiangqi::InputAction> ToInputAction(int key) {
 }
 
 int main() {
-    InitWindow(1000, 900, "Xiangqi - Keyboard");
+    InitWindow(1400, 900, "Xiangqi - Keyboard");
     SetTargetFPS(60);
+
+    const Font historyFont = xiangqi::LoadMoveHistoryFont();
+    float historyRowsFromBottom = 0.0f;
 
     xiangqi::AppState app;
     xiangqi::MockFpga mock;
@@ -49,11 +53,11 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        xiangqi::DrawXiangqiBoard();
+        xiangqi::DrawXiangqiBoard(historyFont);
         if (app.boardSynchronized) {
-            xiangqi::DrawPieces(app.board);
+            xiangqi::DrawPieces(app.board,historyFont);
         }
-        xiangqi::DrawCursor(app.cursor);
+        xiangqi::DrawCursor(app.cursor);//注意虽然是app.cursor，但是这里实际上是该函数的位置坐标参数
 
         if (app.hasSelection) {
             const auto& selected = app.selectedPosition;
@@ -66,8 +70,22 @@ int main() {
         DrawText("Arrows: move cursor / Enter: confirm / R: reset",
                  20, 15, 20, DARKGRAY);
         DrawText(TextFormat("Pieces: %d", app.board.CountPieces()), 20, 75, 20, DARKGRAY);
+
+        xiangqi::DrawMoveHistoryPanel(
+            app.moveHistory, 
+            app.boardSynchronized, 
+            historyFont, 
+            historyRowsFromBottom
+        );
+
         EndDrawing();
     }
+
+    if (historyFont.texture.id != 0 && 
+        historyFont.texture.id != GetFontDefault().texture.id) 
+        { 
+            UnloadFont(historyFont); 
+        }
 
     CloseWindow();
     return 0;
